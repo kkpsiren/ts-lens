@@ -12,87 +12,120 @@ type LocaltrustPrams = {
 	collectPriceWeight?: number
 }
 
+// TODO define a proper type instead of any
+let ijfollows:any
+let ijcomments:any
+let ijmirrors:any
+let ijcollects:any
+let ijprices:any
+
+
 /**
  * Generates basic localtrust by transforming all existing connections
 */
 
 const getFollows = async () => {
-	const  { totalCount } = await db('k3l_follows').count('profile_id as totalCount').first()
+
+	if (ijfollows) {
+		return ijfollows
+	} 
 
 	const follows = await db('k3l_follows')
 		.select('profile_id', 'to_profile_id')
 
 	console.time('parsing follows')
-	let followsMap: any = {}
+	ijfollows = {}
 	for (const { profileId, toProfileId } of follows) {
-		followsMap[profileId] = followsMap[profileId] || []
-		followsMap[profileId][toProfileId] = 1 / totalCount
+		ijfollows[profileId] = ijfollows[profileId] || []
+		ijfollows[profileId][toProfileId] = 1
 	}
 	console.timeEnd('parsing follows')
 
-	return followsMap
+	return ijfollows
 }
 
 const getCommentCounts = async () => {
-	const { totalCount } = await db('k3l_comments').count('profile_id as totalCount').first()
+
+	if (ijcomments) {
+		return ijcomments
+	}
+
 	const comments = await db('k3l_comments')
 		.select('profile_id', 'to_profile_id', db.raw('count(1) as count'))
 		.groupBy('profile_id', 'to_profile_id')
 	
-	let commentsMap: any = {}
+	ijcomments = {}
 	for (const { profileId, toProfileId, count } of comments) {
-		commentsMap[profileId] = commentsMap[profileId] || {}
-		commentsMap[profileId][toProfileId] = +count / totalCount
+		ijcomments[profileId] = ijcomments[profileId] || {}
+		ijcomments[profileId][toProfileId] = +count
 	}
 
 	console.log('length of comments', comments.length)
-	return commentsMap
+	return ijcomments
 }
 
 const getMirrorCounts = async () => {
-	const { totalCount } = await db('k3l_mirrors').count('profile_id as totalCount').first()
+
+	if (ijmirrors) {
+		return ijmirrors
+	}
+
 	const mirrors = await db('k3l_mirrors')
 		.select('profile_id', 'to_profile_id', db.raw('count(1) as count'))
 		.groupBy('profile_id', 'to_profile_id')
 
-	let mirrorsMap: any = {}
+		ijmirrors = {}
 	for (const { profileId, toProfileId, count } of mirrors) {
-		mirrorsMap[profileId] = mirrorsMap[profileId] || {}
-		mirrorsMap[profileId][toProfileId] = +count / totalCount
+		ijmirrors[profileId] = ijmirrors[profileId] || {}
+		ijmirrors[profileId][toProfileId] = +count 
 	}
 
 	console.log('length of mirrors', mirrors.length)
-	return mirrorsMap
+	return ijmirrors
 }
 
 const getCollectCounts = async () => {
-	const { totalCount } = await db('k3l_collect_nft').count('profile_id as totalCount').first()
+
+	if (ijcollects) {
+		return ijcollects
+	}
+
 	const collects = await db('k3l_collect_nft')
 		.select('profile_id', 'to_profile_id', db.raw('count(1) as count'))
 		.groupBy('profile_id', 'to_profile_id')
 
-	let collectsMap: any = {}
+	ijcollects = {}
 	for (const { profileId, toProfileId, count } of collects) {
-		collectsMap[profileId] = collectsMap[profileId] || {}
-		collectsMap[profileId][toProfileId] = +count / totalCount
+		ijcollects[profileId] = ijcollects[profileId] || {}
+		ijcollects[profileId][toProfileId] = +count 
 	}
 
 	console.log('length of collects', collects.length)
-	return collectsMap
+	return ijcollects
 }
 
 const getCollectsPrice = async () => {
-	const { avg } = await db('k3l_collect_nft').avg('matic_price as avg').first()
-	const collects = await db('k3l_collect_nft').select('profile_id', 'to_profile_id', 'matic_price')
 
-	let collectsMap: any = {}
-	for (const { profileId, toProfileId, maticPrice } of collects) {
-		const price = +maticPrice || +avg
-		collectsMap[profileId] = collectsMap[profileId] || {}
-		collectsMap[profileId][toProfileId] = collectsMap[profileId][toProfileId] + price || +price
+	if (ijprices) {
+		return ijprices
 	}
 
-	return collectsMap
+	const price_expr = 
+	`sum(case when (matic_price is null or matic_price = 0) 
+						then 1e-20 
+						else matic_price
+			end) as price`
+	const collects = await db('k3l_collect_nft')
+		.select('profile_id', 'to_profile_id', db.raw(price_expr))
+		.groupBy('profile_id', 'to_profile_id')
+
+	ijprices = {}
+	for (const { profileId, toProfileId, price } of collects) {
+		ijprices[profileId] = ijprices[profileId] || {}
+		ijprices[profileId][toProfileId] = +price
+	}
+
+	return ijprices
 }
 
 const getLocaltrust = async ({followsWeight, commentsWeight, mirrorsWeight, collectsWeight}: LocaltrustPrams, withPrice = false): Promise<LocalTrust<string>> => {
