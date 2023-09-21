@@ -2,9 +2,13 @@ export const config = {
   ogs: ["orbapp.lens", "nilesh.lens", "kipto.lens", "sankalpk.lens"],
   localtrustStrategies: [
     "existingConnections",
+    "existingConnectionsTimed",
     "f6c3m8enhancedConnections",
+    "f6c3m8enhancedConnectionsTimed",
     "f6c3m8col12enhancedConnections",
+    "f6c3m8col12enhancedConnectionsTimed",
     "f6c3m8col12Price",
+    "f6c3m8col12PriceTimed",
   ],
   pretrustStrategies: [
     "pretrustOGs",
@@ -20,9 +24,21 @@ export const config = {
       alpha: 0.5,
     },
     {
+      name: "activeFollowship",
+      pretrust: "pretrustOGs",
+      localtrust: "existingConnectionsTimed",
+      alpha: 0.5,
+    },
+    {
       name: "engagement",
       pretrust: "pretrustOGs",
       localtrust: "f6c3m8enhancedConnections",
+      alpha: 0.5,
+    },
+    {
+      name: "activeEngagement",
+      pretrust: "pretrustOGs",
+      localtrust: "f6c3m8enhancedConnectionsTimed",
       alpha: 0.5,
     },
     {
@@ -32,9 +48,21 @@ export const config = {
       alpha: 0.5,
     },
     {
+      name: "activeInfluencer",
+      pretrust: "pretrustOGs",
+      localtrust: "f6c3m8col12enhancedConnectionsTimed",
+      alpha: 0.5,
+    },
+    {
       name: "creator",
       pretrust: "pretrustOGs",
       localtrust: "f6c3m8col12Price",
+      alpha: 0.5,
+    },
+    {
+      name: "activeCreator",
+      pretrust: "pretrustOGs",
+      localtrust: "f6c3m8col12PriceTimed",
       alpha: 0.5,
     },
   ],
