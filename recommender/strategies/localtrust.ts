@@ -37,10 +37,11 @@ const getFollows = async () => {
 			f.profile_id,
 			f.to_profile_id,
 			POWER(1-(1/365::numeric),
-							(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - TO_TIMESTAMP(p.source_timestamp/1000))) / (60 * 60 * 24))::numeric
+							(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - TO_TIMESTAMP(max(p.source_timestamp)/1000))) / (60 * 60 * 24))::numeric
 							) AS v
 		FROM k3l_follows AS f
-		INNER JOIN profile_stats AS p ON (p.profile_id=f.to_profile_id)
+		INNER JOIN profile_post AS p ON (p.profile_id=f.to_profile_id)
+		GROUP BY f.profile_id, f.to_profile_id
 	`)
 	const follows = res.rows
 	console.timeEnd('fetching follows')
