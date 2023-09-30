@@ -219,43 +219,43 @@ const existingConnectionsTimed: LocaltrustStrategy = async (): Promise<LocalTrus
 		{ followsWeight: 1, withTimeDecay: true })
 }
 
-const f6c3m8enhancedConnections: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
+const f1c8m3enhancedConnections: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
 	return getLocaltrust(
-		{ followsWeight: 6, commentsWeight: 3, mirrorsWeight: 8 })
+		{ followsWeight: 1, commentsWeight: 8, mirrorsWeight: 3 })
 }
 
-const f6c3m8enhancedConnectionsTimed: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
+const f1c8m3enhancedConnectionsTimed: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
 	return getLocaltrust(
-		{ followsWeight: 6, commentsWeight: 3, mirrorsWeight: 8, withTimeDecay: true })
+		{ followsWeight: 1, commentsWeight: 8, mirrorsWeight: 3, withTimeDecay: true })
 }
 
-const f6c3m8col12enhancedConnections: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
+const f1c8m3col12enhancedConnections: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
 	return getLocaltrust(
-		{ followsWeight: 6, commentsWeight: 3, mirrorsWeight: 8, collectsWeight: 12 })
+		{ followsWeight: 1, commentsWeight: 8, mirrorsWeight: 3, collectsWeight: 12 })
 }
 
-const f6c3m8col12enhancedConnectionsTimed: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
+const f1c8m3col12enhancedConnectionsTimed: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
 	return getLocaltrust(
-		{ followsWeight: 6, commentsWeight: 3, mirrorsWeight: 8, collectsWeight: 12, withTimeDecay: true })
+		{ followsWeight: 1, commentsWeight: 8, mirrorsWeight: 3, collectsWeight: 12, withTimeDecay: true })
 }
 
-const f6c3m8col12Price: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
+const f1c8m3col12Price: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
 	return getLocaltrust(
-		{ followsWeight: 6, commentsWeight: 3, mirrorsWeight: 8, collectsWeight: 12, withPrice: true })
+		{ followsWeight: 1, commentsWeight: 8, mirrorsWeight: 3, collectsWeight: 12, withPrice: true })
 }
 
-const f6c3m8col12PriceTimed: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
+const f1c8m3col12PriceTimed: LocaltrustStrategy = async (): Promise<LocalTrust<string>> => {
 	return getLocaltrust(
-		{ followsWeight: 6, commentsWeight: 3, mirrorsWeight: 8, collectsWeight: 12, withPrice: true, withTimeDecay: true })
+		{ followsWeight: 1, commentsWeight: 8, mirrorsWeight: 3, collectsWeight: 12, withPrice: true, withTimeDecay: true })
 }
 
 export const strategies: Record<string, LocaltrustStrategy> = {
 	existingConnections,
 	existingConnectionsTimed,
-	f6c3m8enhancedConnections,
-	f6c3m8enhancedConnectionsTimed,
-	f6c3m8col12enhancedConnections,
-	f6c3m8col12enhancedConnectionsTimed,
-	f6c3m8col12Price,
-	f6c3m8col12PriceTimed
+	f1c8m3enhancedConnections,
+	f1c8m3enhancedConnectionsTimed,
+	f1c8m3col12enhancedConnections,
+	f1c8m3col12enhancedConnectionsTimed,
+	f1c8m3col12Price,
+	f1c8m3col12PriceTimed
 }
