@@ -22,6 +22,7 @@ export default class Rankings {
 		console.timeEnd('pretrust_generation')
 
 		console.log(`Generated pretrust with ${pretrust.length} entries`)
+		console.log(`Slice of pretrust: ${JSON.stringify(pretrust.slice(0,10))}`)
 
 		const globaltrust = await Rankings.runEigentrust(ids, pretrust, strategy.localtrust, strategy.alpha)
 		console.log("Generated globaltrust")
