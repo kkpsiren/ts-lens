@@ -1,10 +1,29 @@
+import  path from 'path'
 import { Pretrust } from '../../types'
 import { config } from '../config'
 import { getDB } from '../../utils';
+import { readFile } from 'fs/promises';
 
 export type PretrustStrategy = () => Promise<Pretrust<string>>
 
 const db = getDB()
+
+//TODO generic function that takes filenames from config instead of hardcoding
+const pretrustCommunity: PretrustStrategy = async() => {
+	const data = await readFile(path.resolve(__dirname, '../../pretrusts/community1.json'), 'utf-8')
+	const json = JSON.parse(data);
+	const profiles = json.data.items
+	const pretrust: Pretrust<string> = []
+
+	profiles.forEach(({ profileId }: { profileId: string }) => {
+		pretrust.push({
+			i: profileId,
+			v: 1 / profiles.length
+		})		
+	})
+
+	return pretrust
+}
 
 const pretrustAllEqually: PretrustStrategy = async () => {
 	return []
@@ -41,5 +60,6 @@ const pretrustOGs: PretrustStrategy = async () => {
 export const strategies: Record<string, PretrustStrategy> = {
 	pretrustOGs,
 	pretrustFirstFifty,
-	pretrustAllEqually
+	pretrustAllEqually,
+	pretrustCommunity
 }
