@@ -36,7 +36,7 @@ const getFollows = async () => {
 		SELECT 
 			f.profile_id,
 			f.to_profile_id,
-			POWER(1-(1/365::numeric),
+			POWER(1-(1/52::numeric),
 							(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - TO_TIMESTAMP(max(p.source_timestamp)/1000))) / (60 * 60 * 24))::numeric
 							) AS v
 		FROM k3l_follows AS f
@@ -65,7 +65,7 @@ const getIJCounts = async (ijTableName: string) => {
 	const res = await db.raw(`
 		SELECT 
 			profile_id, to_profile_id,
-			SUM(power(1-(1/365::numeric),
+			SUM(power(1-(1/52::numeric),
 							(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - created_at)) / (60 * 60 * 24))::numeric)) as v,
 			count(1) as count
 		FROM ${ijTableName} 
