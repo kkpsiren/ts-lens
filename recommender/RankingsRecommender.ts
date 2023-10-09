@@ -72,7 +72,8 @@ export default class Rankings {
 				},
 				alpha: alpha,
 				epsilon: 1.0,
-				flatTail: 2
+				flatTail: 2,
+				maxIterations: 50,
 			}
 
 			const eigentrustAPI = `${process.env.EIGENTRUST_API}/basic/v1/compute`
