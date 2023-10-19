@@ -1,8 +1,9 @@
 export type Profile = {
 	profileid: string
 	handle: string
-	followings: number[]
-	createdAt: number
+	followings?: number[]
+	createdAt?: number
+	rank?: number
 }
 
 export type Post = {

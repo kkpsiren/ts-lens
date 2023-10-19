@@ -1,6 +1,6 @@
 import  path from 'path'
 import axios from "axios"
-import { Pretrust, GlobalTrust } from '../types'
+import { Profile, Pretrust, GlobalTrust } from '../types'
 import { objectFlip } from "./utils"
 import { strategies as ptStrategies  } from './strategies/pretrust'
 import { getDB } from '../utils'
@@ -188,6 +188,31 @@ export default class Rankings {
 			.first()
 
 		return res && res.score
+	}
+	
+	static async getFollowSuggestions(strategyName: string, id: number, limit: number): Promise<Profile[]> {
+
+		const res = await db.raw(`
+		SELECT lt.j, prof.handle, r.rank
+		FROM localtrust as lt
+		LEFT JOIN k3l_follows as f ON (
+				lt.i = f.profile_id AND
+				lt.j = f.to_profile_id) 
+		INNER JOIN k3l_profiles as prof ON (
+				lt.j = prof.profile_id)
+		INNER JOIN k3l_rank as r ON (r.profile_id = lt.j and lt.date=r.date)
+		INNER JOIN globaltrust_config as rc ON (rc.localtrust=lt.strategy_name and rc.strategy_name=r.strategy_name)
+		WHERE 
+			r.strategy_name=:strategyName
+			AND r.date=(select max(date) from k3l_rank where strategy_name=:strategyName)
+			AND rc.date=(select max(date) from globaltrust_config where strategy_name=:strategyName)
+			AND lt.i=:id
+			AND f.profile_id IS NULL
+		ORDER BY r.rank asc
+		LIMIT :limit
+	`, { strategyName, id, limit})
+
+		return res.rows
 	}
 
 	static async getLatestDateByStrategyName(strategyName: string): Promise<string> {
