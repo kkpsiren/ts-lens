@@ -17,55 +17,19 @@ export const config = {
   contentStrategies: ["viralPosts"],
   rankingStrategies: [
     {
-      name: "community1Engagement",
-      pretrust: "pretrustCommunity1",
-      localtrust: "f1c8m3enhancedConnectionsTimed",
-      alpha: 0.5,
-    },
-    {
-      name: "community2Engagement",
-      pretrust: "pretrustCommunity2",
-      localtrust: "f1c8m3enhancedConnectionsTimed",
-      alpha: 0.5,
-    },
-    {
-      name: "community3Engagement",
-      pretrust: "pretrustCommunity3",
-      localtrust: "f1c8m3enhancedConnectionsTimed",
-      alpha: 0.5,
-    },
-    {
-      name: "community1Influencer",
-      pretrust: "pretrustCommunity1",
-      localtrust: "f1c8m3col12enhancedConnectionsTimed",
-      alpha: 0.5,
-    },
-    {
-      name: "community2Influencer",
-      pretrust: "pretrustCommunity2",
-      localtrust: "f1c8m3col12enhancedConnectionsTimed",
-      alpha: 0.5,
-    },
-    {
-      name: "community3Influencer",
-      pretrust: "pretrustCommunity3",
-      localtrust: "f1c8m3col12enhancedConnectionsTimed",
-      alpha: 0.5,
-    },
-    {
-      name: "community1Creator",
+      name: "photoArtCreator",
       pretrust: "pretrustCommunity1",
       localtrust: "f1c8m3col12PriceTimed",
       alpha: 0.5,
     },
     {
-      name: "community2Creator",
+      name: "defiCreator",
       pretrust: "pretrustCommunity2",
       localtrust: "f1c8m3col12PriceTimed",
       alpha: 0.5,
     },
     {
-      name: "community3Creator",
+      name: "animeCreator",
       pretrust: "pretrustCommunity3",
       localtrust: "f1c8m3col12PriceTimed",
       alpha: 0.5,
