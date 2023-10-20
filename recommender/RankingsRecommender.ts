@@ -193,21 +193,29 @@ export default class Rankings {
 	static async getFollowSuggestions(strategyName: string, id: number, limit: number): Promise<Profile[]> {
 
 		const res = await db.raw(`
-		SELECT lt.j, r.rank
-		FROM localtrust as lt
-		LEFT JOIN k3l_follows as f ON (
-				lt.i = f.profile_id AND
-				lt.j = f.to_profile_id) 
-		INNER JOIN k3l_rank as r ON (r.profile_id = lt.j and lt.date=r.date)
-		INNER JOIN globaltrust_config as rc ON (rc.localtrust=lt.strategy_name and rc.strategy_name=r.strategy_name)
-		WHERE 
-			r.strategy_name=:strategyName
-			AND r.date=(select max(date) from k3l_rank where strategy_name=:strategyName)
-			AND rc.date=(select max(date) from globaltrust_config where strategy_name=:strategyName)
-			AND lt.i=:id
-			AND f.profile_id IS NULL
-		ORDER BY r.rank asc
-		LIMIT :limit
+		WITH
+		suggested AS (
+			SELECT
+				lt.j as profile_id,
+				max(lt.date) as date,
+				max(lt.v) as v
+				FROM localtrust AS lt
+				WHERE lt.i=:id
+				AND lt.j NOT IN (SELECT f.to_profile_id FROM k3l_follows as f WHERE f.profile_id=:id)
+				GROUP BY lt.j
+				ORDER BY v
+				LIMIT :limit
+			) 
+			SELECT
+				prof.profile_id as profileid,
+				prof.handle as handle,
+				r.rank as rank
+			FROM suggested
+			INNER JOIN k3l_profiles as prof ON (prof.profile_id=suggested.profile_id)
+			INNER JOIN k3l_rank as r ON (r.profile_id=suggested.profile_id
+																	AND r.strategy_name=:strategyName
+																	AND r.date=suggested.date)
+			ORDER BY r.rank 
 	`, { strategyName, id, limit})
 
 		return res.rows
