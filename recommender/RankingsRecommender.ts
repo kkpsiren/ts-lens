@@ -193,13 +193,11 @@ export default class Rankings {
 	static async getFollowSuggestions(strategyName: string, id: number, limit: number): Promise<Profile[]> {
 
 		const res = await db.raw(`
-		SELECT lt.j, prof.handle, r.rank
+		SELECT lt.j, r.rank
 		FROM localtrust as lt
 		LEFT JOIN k3l_follows as f ON (
 				lt.i = f.profile_id AND
 				lt.j = f.to_profile_id) 
-		INNER JOIN k3l_profiles as prof ON (
-				lt.j = prof.profile_id)
 		INNER JOIN k3l_rank as r ON (r.profile_id = lt.j and lt.date=r.date)
 		INNER JOIN globaltrust_config as rc ON (rc.localtrust=lt.strategy_name and rc.strategy_name=r.strategy_name)
 		WHERE 

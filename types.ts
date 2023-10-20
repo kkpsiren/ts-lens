@@ -1,6 +1,6 @@
 export type Profile = {
 	profileid: string
-	handle: string
+	handle?: string
 	followings?: number[]
 	createdAt?: number
 	rank?: number
