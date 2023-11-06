@@ -17,62 +17,62 @@ import { string } from 'yargs'
 
 
 export default async (app: Express) => {
-	const userRecommender = new UserRecommender()
-	const localTrustContentRecommender = new LocalTrustContentRecommender(userRecommender)
-	await userRecommender.init()
+	// const userRecommender = new UserRecommender()
+	// const localTrustContentRecommender = new LocalTrustContentRecommender(userRecommender)
+	// await userRecommender.init()
 
 	app.get('/_health', async (req: Request, res: Response) => {
 		res.status(200).json({ status: 'ok' });
 	});	
 
-	app.get('/suggest', async (req: Request, res: Response) => {
-		const reqUri = req.originalUrl.split("?").shift()
-		let id: number
+	// app.get('/suggest', async (req: Request, res: Response) => {
+	// 	const reqUri = req.originalUrl.split("?").shift()
+	// 	let id: number
 
-		try {
-			id = await getIdFromQueryParams(req.query)
-		}
-		catch (e: any) {
-			return res.status(400).send(e.message)
-		}
-		console.log(`${reqUri} personalized for id: ${id}`)
+	// 	try {
+	// 		id = await getIdFromQueryParams(req.query)
+	// 	}
+	// 	catch (e: any) {
+	// 		return res.status(400).send(e.message)
+	// 	}
+	// 	console.log(`${reqUri} personalized for id: ${id}`)
 
-		try {
-			const re = await userRecommender.recommend(id)
-			const profiles = await getProfilesFromIdsOrdered(re)
-			profiles.map((profile: any, i: number) => {
-				profile.rank = i + 1
-			})
-			return res.send(profiles)
-		}
-		catch (e: any) {
-			console.error(`Error in ${reqUri} for id: ${id}`, e)
-			res.status(500).send(`Could not get ${reqUri}`)
-		}
-	})
+	// 	try {
+	// 		const re = await userRecommender.recommend(id)
+	// 		const profiles = await getProfilesFromIdsOrdered(re)
+	// 		profiles.map((profile: any, i: number) => {
+	// 			profile.rank = i + 1
+	// 		})
+	// 		return res.send(profiles)
+	// 	}
+	// 	catch (e: any) {
+	// 		console.error(`Error in ${reqUri} for id: ${id}`, e)
+	// 		res.status(500).send(`Could not get ${reqUri}`)
+	// 	}
+	// })
 
-	app.get('/suggest_posts', async (req: Request, res: Response) => {
-		const reqUri = req.originalUrl.split("?").shift()
-		const limit = req.query.limit ? +req.query.limit : 50
-		let id: number
+	// app.get('/suggest_posts', async (req: Request, res: Response) => {
+	// 	const reqUri = req.originalUrl.split("?").shift()
+	// 	const limit = req.query.limit ? +req.query.limit : 50
+	// 	let id: number
 
-		try {
-			id = await getIdFromQueryParams(req.query)
-		}
-		catch (e: any) {
-			return res.status(400).send(e.message)
-		}
-		console.log(`${reqUri} personalized for id: ${id}`)
+	// 	try {
+	// 		id = await getIdFromQueryParams(req.query)
+	// 	}
+	// 	catch (e: any) {
+	// 		return res.status(400).send(e.message)
+	// 	}
+	// 	console.log(`${reqUri} personalized for id: ${id}`)
 
-		try {
-			const ids = await localTrustContentRecommender.recommend(id, limit)
-			return res.send(ids)
-		}
-		catch (e: any) {
-			console.error(`Error in ${reqUri} for id: ${id}`, e)
-			res.status(500).send(`Could not get ${reqUri}`)	
-		}
-	})
+	// 	try {
+	// 		const ids = await localTrustContentRecommender.recommend(id, limit)
+	// 		return res.send(ids)
+	// 	}
+	// 	catch (e: any) {
+	// 		console.error(`Error in ${reqUri} for id: ${id}`, e)
+	// 		res.status(500).send(`Could not get ${reqUri}`)	
+	// 	}
+	// })
 
 	app.get(['/profile_count', '/profile/count'], async (req: Request, res: Response) => {
 		const reqUri = req.originalUrl.split("?").shift()
@@ -83,6 +83,7 @@ export default async (app: Express) => {
 			date = req.query.date && isValidDate(req.query.date as string) ? req.query.date as string : await Rankings.getLatestDateByStrategyName(strategyName)
 		}
 		catch (e: any) {
+			console.log(`Error in ${reqUri}`, e)
 			return res.status(400).send(e.message)
 		}
 		console.log(`${reqUri} for strategyName: ${strategyName}`)
@@ -108,6 +109,7 @@ export default async (app: Express) => {
 			date = req.query.date && isValidDate(req.query.date as string) ? req.query.date as string : await Rankings.getLatestDateByStrategyName(strategyName)
 		}
 		catch (e: any) {
+			console.log(`Error in ${reqUri}`, e)
 			return res.status(400).send(e.message)
 		}
 		console.log(`${reqUri} for id: ${id} and strategyName: ${strategyName}`)
@@ -133,6 +135,7 @@ export default async (app: Express) => {
 			date = req.query.date && isValidDate(req.query.date as string) ? req.query.date as string : await Rankings.getLatestDateByStrategyName(strategyName)
 		}
 		catch (e: any) {
+			console.log(`Error in ${reqUri}`, e)
 			return res.status(400).send(e.message)
 		}
 		console.log(`${reqUri} for ids: ${ids} and strategyName: ${strategyName}`)
@@ -158,6 +161,7 @@ export default async (app: Express) => {
 			date = req.query.date && isValidDate(req.query.date as string) ? req.query.date as string : await Rankings.getLatestDateByStrategyName(strategyName)
 		}
 		catch (e: any) {
+			console.log(`Error in ${reqUri}`, e)
 			return res.status(400).send(e.message)
 		}
 		console.log(`${reqUri} for id: ${id} and strategyName: ${strategyName}`)
@@ -165,6 +169,31 @@ export default async (app: Express) => {
 		try {
 			const rank = await Rankings.getRankOfUser(strategyName, id, date);
 			return res.send({ rank })
+		}
+		catch (e: any) {
+			console.error(`Error in ${reqUri} for handle: ${id} and strategyName: ${strategyName}`, e)
+			res.status(500).send(`Could not get ${reqUri}`)
+		}
+	})
+
+	app.get(['/profile_suggest', '/profile/suggest'], async (req: Request, res: Response) => {
+		const reqUri = req.originalUrl.split("?").shift()
+		const limit = req.query.limit ? +req.query.limit : 100
+		let id: number, strategyName: string
+		
+		try {
+			id = await getIdFromQueryParams(req.query)
+			strategyName = await getStrategyNameFromQueryParams(req.query)
+		}
+		catch (e: any) {
+			console.log(`Error in ${reqUri}`, e)
+			return res.status(400).send(e.message)
+		}
+		console.log(`${reqUri} for id: ${id} and strategyName: ${strategyName}`)
+
+		try {
+			const profiles = await Rankings.getFollowSuggestions(strategyName, id, limit);
+			return res.send(profiles)
 		}
 		catch (e: any) {
 			console.error(`Error in ${reqUri} for handle: ${id} and strategyName: ${strategyName}`, e)
@@ -239,6 +268,7 @@ export default async (app: Express) => {
 			date = req.query.date && isValidDate(req.query.date as string) ? req.query.date as string : await Rankings.getLatestDateByStrategyName(strategyName)
 		}
 		catch (e: any) {
+			console.log(`Error in ${reqUri}`, e)
 			return res.status(400).send(e.message)
 		}
 		console.log(`${reqUri} for strategyName: ${strategyName} on ${date} ranging from [${offset} to ${offset + limit}]`)

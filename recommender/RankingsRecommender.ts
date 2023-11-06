@@ -1,6 +1,6 @@
 import  path from 'path'
 import axios from "axios"
-import { Pretrust, GlobalTrust } from '../types'
+import { Profile, Pretrust, GlobalTrust } from '../types'
 import { objectFlip } from "./utils"
 import { strategies as ptStrategies  } from './strategies/pretrust'
 import { getDB } from '../utils'
@@ -22,6 +22,7 @@ export default class Rankings {
 		console.timeEnd('pretrust_generation')
 
 		console.log(`Generated pretrust with ${pretrust.length} entries`)
+		console.log(`Slice of pretrust: ${JSON.stringify(pretrust.slice(0,10))}`)
 
 		const globaltrust = await Rankings.runEigentrust(ids, pretrust, strategy.localtrust, strategy.alpha)
 		console.log("Generated globaltrust")
@@ -71,7 +72,8 @@ export default class Rankings {
 				},
 				alpha: alpha,
 				epsilon: 1.0,
-				flatTail: 2
+				flatTail: 2,
+				maxIterations: 50,
 			}
 
 			const eigentrustAPI = `${process.env.EIGENTRUST_API}/basic/v1/compute`
@@ -186,6 +188,37 @@ export default class Rankings {
 			.first()
 
 		return res && res.score
+	}
+	
+	static async getFollowSuggestions(strategyName: string, id: number, limit: number): Promise<Profile[]> {
+
+		const res = await db.raw(`
+		WITH
+		suggested AS (
+			SELECT
+				lt.j as profile_id,
+				max(lt.date) as date,
+				max(lt.v) as v
+				FROM localtrust AS lt
+				WHERE lt.i=:id
+				AND lt.j NOT IN (SELECT f.to_profile_id FROM k3l_follows as f WHERE f.profile_id=:id)
+				GROUP BY lt.j
+				ORDER BY v
+				LIMIT :limit
+			) 
+			SELECT
+				prof.profile_id as profileid,
+				prof.handle as handle,
+				r.rank as rank
+			FROM suggested
+			INNER JOIN k3l_profiles as prof ON (prof.profile_id=suggested.profile_id)
+			INNER JOIN k3l_rank as r ON (r.profile_id=suggested.profile_id
+																	AND r.strategy_name=:strategyName
+																	AND r.date=suggested.date)
+			ORDER BY r.rank 
+	`, { strategyName, id, limit})
+
+		return res.rows
 	}
 
 	static async getLatestDateByStrategyName(strategyName: string): Promise<string> {
